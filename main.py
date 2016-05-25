@@ -23,12 +23,12 @@ def db_init():
     cur = conn.cursor()    
     return conn, cur
       
-def db_createTables(cur):
+def db_createTables(conn, cur):
   """Cette fonction initialise la base de données. Elle est invoquée par
      un chemin spécial - voir /debug/db/reset"""
   
   cur.execute('''\
-    DROP TABLE Product;
+    DROP TABLE IF EXISTS Product;
     CREATE TABLE Product (
       pid SERIAL,
       name varchar,
@@ -38,6 +38,7 @@ def db_createTables(cur):
     INSERT INTO Product (name, price) VALUES ('Poire', 1.60);
     INSERT INTO Product (name, price) VALUES ('Fraise', 3.80);
     ''')
+  conn.commit()
 
 def db_select(cur, sql, params = None):
   """Cette fonction exécute une requête SQL de type SELECT
@@ -68,7 +69,7 @@ def route_dbinit():
   """Cette route sert à initialiser (ou nettoyer) la base de données."""
   
   conn, cur = db_init()
-  db_createTables(cur)
+  db_createTables(conn, cur)
   conn.close()
   return "Done."
 
